@@ -1,0 +1,10 @@
+server:
+  port: 31001
+spring:
+  application:
+    name: xc-service-manage-cms
+  data:
+    mongodb:
+      #注意: uri后不指定数据库(collection),连接成功后,会切换到database属性对应的collection
+      uri: mongodb://root:123@localhost:27017
+      database: xc_cms
