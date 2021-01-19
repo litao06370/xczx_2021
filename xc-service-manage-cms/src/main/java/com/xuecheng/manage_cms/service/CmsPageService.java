@@ -1,5 +1,6 @@
 package com.xuecheng.manage_cms.service;
 
+import com.sun.org.apache.bcel.internal.generic.IFNULL;
 import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.cms.request.QueryPageRequest;
 import com.xuecheng.framework.domain.cms.response.CmsPageResult;
@@ -7,11 +8,14 @@ import com.xuecheng.framework.model.response.CommonCode;
 import com.xuecheng.framework.model.response.QueryResponseResult;
 import com.xuecheng.framework.model.response.QueryResult;
 import com.xuecheng.manage_cms.dao.CmsPageRepository;
+import freemarker.core.OptInTemplateClassResolver;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+
+import java.util.Optional;
 
 /**
  * @version 1.0
@@ -23,6 +27,13 @@ public class CmsPageService {
     @Autowired
     CmsPageRepository cmsPageRepository;
 
+    /**
+     * 查询列表(带分页)
+     * @param page
+     * @param size
+     * @param queryPageRequest
+     * @return
+     */
     public QueryResponseResult findList(int page, int size, QueryPageRequest queryPageRequest) {
         Example example = null;
 //        非空判断
@@ -61,6 +72,11 @@ public class CmsPageService {
         return new QueryResponseResult(CommonCode.SUCCESS, queryResult);
     }
 
+    /**
+     * 新增页面
+     * @param cmsPage
+     * @return
+     */
     public CmsPageResult add(CmsPage cmsPage) {
         /*
         1.判断接收的页面参数是否为空
@@ -78,6 +94,49 @@ public class CmsPageService {
         cmsPage.setPageId(null);
 
         return new CmsPageResult(CommonCode.SUCCESS,cmsPageRepository.save(cmsPage));
+    }
+
+    /**
+     * 根据Object_id 查询页面
+     * @param id
+     * @return
+     */
+    public CmsPage findById(String id) {
+        Optional<CmsPage> optional = cmsPageRepository.findById(id);
+        if (optional.isPresent()) {
+            CmsPage cmsPage = optional.get();
+            return cmsPage;
+        }
+        return null;
+    }
+
+    public CmsPageResult updatePage(String id, CmsPage cmsPage){
+        if (cmsPage != null) {
+            CmsPage one = this.findById(id);
+            if (one != null) {
+                //更新模板id
+                one.setTemplateId(cmsPage.getTemplateId());
+                //更新所属站点
+                one.setSiteId(cmsPage.getSiteId());
+                //更新页面别名
+                one.setPageAliase(cmsPage.getPageAliase());
+                //更新页面名称
+                one.setPageName(cmsPage.getPageName());
+                //更新访问路径
+                one.setPageWebPath(cmsPage.getPageWebPath());
+                //更新物理路径
+                one.setPagePhysicalPath(cmsPage.getPagePhysicalPath());
+                //执行更新
+                cmsPageRepository.save(one);
+                if (one != null) {
+                    return new CmsPageResult(CommonCode.SUCCESS, one);
+                }
+                return new CmsPageResult(CommonCode.FAIL, null);
+            }
+        }
+        return new CmsPageResult(CommonCode.FAIL, null);
+
+
     }
 
 }
