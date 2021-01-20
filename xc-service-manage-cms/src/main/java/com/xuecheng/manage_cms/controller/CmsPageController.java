@@ -5,6 +5,7 @@ import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.cms.request.QueryPageRequest;
 import com.xuecheng.framework.domain.cms.response.CmsPageResult;
 import com.xuecheng.framework.model.response.QueryResponseResult;
+import com.xuecheng.framework.model.response.ResponseResult;
 import com.xuecheng.manage_cms.dao.CmsPageRepository;
 import com.xuecheng.manage_cms.service.CmsPageService;
 import io.swagger.annotations.ApiOperation;
@@ -31,7 +32,7 @@ public class CmsPageController implements CmsPageControllerApi {
     @PostMapping(API_URL + "/add")
     @Override
     public CmsPageResult add(@RequestBody CmsPage cmsPage) {
-        CmsPageResult result = cmsPageService.add(cmsPage);
+        CmsPageResult result = cmsPageService.addPage(cmsPage);
         return result;
     }
 
@@ -47,6 +48,12 @@ public class CmsPageController implements CmsPageControllerApi {
         return cmsPageService.updatePage(id, cmsPage);
     }
 
+    @DeleteMapping(API_URL + "/delete/{id}")
+    @Override
+    public ResponseResult delete(@PathVariable("id") String id) {
+        return cmsPageService.deletePage(id);
+    }
+
     /**
      * 自定义建议测试
      *
@@ -55,6 +62,6 @@ public class CmsPageController implements CmsPageControllerApi {
     @GetMapping("/test1")
     @ApiOperation("简易测试连接成功与否")
     public String test1() {
-        return "test1 successs!";
+        return "test1 success!";
     }
 }

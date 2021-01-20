@@ -3,10 +3,13 @@ package com.xuecheng.manage_cms.service;
 import com.sun.org.apache.bcel.internal.generic.IFNULL;
 import com.xuecheng.framework.domain.cms.CmsPage;
 import com.xuecheng.framework.domain.cms.request.QueryPageRequest;
+import com.xuecheng.framework.domain.cms.response.CmsCode;
 import com.xuecheng.framework.domain.cms.response.CmsPageResult;
+import com.xuecheng.framework.exception.ExceptionCast;
 import com.xuecheng.framework.model.response.CommonCode;
 import com.xuecheng.framework.model.response.QueryResponseResult;
 import com.xuecheng.framework.model.response.QueryResult;
+import com.xuecheng.framework.model.response.ResponseResult;
 import com.xuecheng.manage_cms.dao.CmsPageRepository;
 import freemarker.core.OptInTemplateClassResolver;
 import org.apache.commons.lang3.StringUtils;
@@ -77,7 +80,7 @@ public class CmsPageService {
      * @param cmsPage
      * @return
      */
-    public CmsPageResult add(CmsPage cmsPage) {
+    public CmsPageResult addPage(CmsPage cmsPage) {
         /*
         1.判断接收的页面参数是否为空
         2.判断该页面在数据库中是否已存在
@@ -89,7 +92,7 @@ public class CmsPageService {
         }
         CmsPage one = cmsPageRepository.findByPageNameAndSiteIdAndPageWebPath(cmsPage.getPageName(), cmsPage.getSiteId(), cmsPage.getPageWebPath());
         if (!ObjectUtils.isEmpty(one)) {
-            return new CmsPageResult(CommonCode.FAIL, null);
+            ExceptionCast.cast(CmsCode.CMS_ADDPAGE_EXISTSNAME);
         }
         cmsPage.setPageId(null);
 
@@ -102,6 +105,7 @@ public class CmsPageService {
      * @return
      */
     public CmsPage findById(String id) {
+
         Optional<CmsPage> optional = cmsPageRepository.findById(id);
         if (optional.isPresent()) {
             CmsPage cmsPage = optional.get();
@@ -110,10 +114,20 @@ public class CmsPageService {
         return null;
     }
 
+    /**
+     * 修改页面
+     * @param id
+     * @param cmsPage
+     * @return
+     */
     public CmsPageResult updatePage(String id, CmsPage cmsPage){
-        if (cmsPage != null) {
+        if (cmsPage == null) {
+
+        }
             CmsPage one = this.findById(id);
             if (one != null) {
+                ExceptionCast.cast(CmsCode.CMS_ADDPAGE_EXISTSNAME);
+            }
                 //更新模板id
                 one.setTemplateId(cmsPage.getTemplateId());
                 //更新所属站点
@@ -131,12 +145,22 @@ public class CmsPageService {
                 if (one != null) {
                     return new CmsPageResult(CommonCode.SUCCESS, one);
                 }
-                return new CmsPageResult(CommonCode.FAIL, null);
-            }
-        }
+
+
+
         return new CmsPageResult(CommonCode.FAIL, null);
 
 
+    }
+
+
+    public ResponseResult deletePage(String id){
+        CmsPage one = this.findById(id);
+        if (one != null) {
+            cmsPageRepository.deleteById(id);
+            return new ResponseResult(CommonCode.SUCCESS);
+        }
+        return new ResponseResult(CommonCode.FAIL);
     }
 
 }
