@@ -125,7 +125,7 @@ public class CmsPageService {
 
         }
             CmsPage one = this.findById(id);
-            if (one != null) {
+            if (one == null) {
                 ExceptionCast.cast(CmsCode.CMS_ADDPAGE_EXISTSNAME);
             }
                 //更新模板id
