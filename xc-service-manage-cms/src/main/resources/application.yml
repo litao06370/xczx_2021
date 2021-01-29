@@ -8,3 +8,7 @@ spring:
       #注意: uri后不指定数据库(collection),连接成功后,会切换到database属性对应的collection
       uri: mongodb://root:123@localhost:27017
       database: xc_cms
+freemarker:
+  cache: false #关闭模板缓存,方便测试
+  settings:
+    template_update_delay: 0
